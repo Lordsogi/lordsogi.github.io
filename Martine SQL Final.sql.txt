@@ -1,0 +1,81 @@
+mysql;
+SHOW DATABASES;
+USE messaging;
+SHOW TABLES;
+SELECT * FROM messaging;
+SELECT * FROM contact_list;
+SELECT * FROM person;
+INSERT INTO person (person_id, first_name, last_name)
+VALUES (7, "Christian", "Martine");
+SELECT * FROM person;
+SHOW COLUMNS FROM person;
+ALTER TABLE person ADD gender VARCHAR(255) NOT NULL;
+SHOW COLUMNS FROM person;
+UPDATE person
+	SET gender = “Dude”
+	WHERE person_id = 7;
+DELETE FROM person WHERE first_name = "Diana" AND last_name = "Taurasi";
+SELECT * FROM person;
+SHOW COLUMNS FROM contact_list;
+ALTER TABLE contact_list ADD favorite VARCHAR(10) NULL;
+SHOW COLUMNS FROM contact_list;
+UPDATE contact_list
+	SET favorite = “y"
+	WHERE contact_id = 1;
+SELECT * FROM contact_list;
+UPDATE contact_list
+	SET favorite = “n"
+	WHERE contact_id <> 1;
+SELECT * FROM contact_list;
+INSERT INTO contact_list (connection_id, person_id, contact_id, favorite)
+	VALUES (DEFAULT, 6, 4, "n");
+INSERT INTO contact_list (connection_id, person_id, contact_id, favorite)
+	VALUES (DEFAULT, 7, 1, "n");
+INSERT INTO contact_list (connection_id, person_id, contact_id, favorite)
+	VALUES (DEFAULT, 11, 4, "y");
+CREATE TABLE image (
+image_id INT(8) NOT NULL auto_increment,
+image_name VARCHAR(50) NOT NULL,
+image_location VARCHAR(250) NOT NULL,
+PRIMARY KEY (image_id)
+) AUTO_INCREMENT = 1;
+SHOW COLUMNS FROM image;
+CREATE TABLE message_image (
+message_id INT(8) NOT NULL,
+image_id INT(8) NOT NULL,
+PRIMARY KEY (message_id, image_id)
+);
+SHOW COLUMNS FROM message_table;
+INSERT INTO image (image_id, image_name, image_location) VALUES (1, "Steve", "Las Vegas");
+INSERT INTO image (image_id, image_name, image_location) VALUES (2, "Henry", "New York");
+INSERT INTO image (image_id, image_name, image_location) VALUES (3, "Cat In The Hat", "Atlanta");
+INSERT INTO image (image_id, image_name, image_location) VALUES (4, "Couldy Night", "France");
+INSERT INTO image (image_id, image_name, image_location) VALUES (5, "Mona Lisa", "Louvre Museum");
+SELECT * FROM image;
+INSERT INTO message_image (message_id, image_id) VALUES (1,1);
+INSERT INTO message_image (message_id, image_id) VALUES (2,2);
+INSERT INTO message_image (message_id, image_id) VALUES (3,3);
+INSERT INTO message_image (message_id, image_id) VALUES (4,4);
+INSERT INTO message_image (message_id, image_id) VALUES (5,5);
+SELECT * FROM message_image;
+SELECT sender.first_name AS "SENDER_FIRST_NAME",
+sender.last_name AS "SENDER_LAST_NAME",
+receiver.first_name AS "RECEIVER_FIRST_NAME",
+receiver.last_name AS "RECEIVER_LAST_NAME",
+message.message_id AS "MESSAGE_ID",
+message.message AS "MESSAGE",
+message.send_datetime AS "MESSAGE_TIMESTAMP"
+FROM person AS sender
+JOIN message
+ON sender.person_id = message.sender_id
+JOIN person AS receiver
+ON message.receiver_id = receiver.person_id
+WHERE UPPER(sender.last_name) = 'PHELPS'
+AND UPPER(sender.first_name) = 'MICHAEL';
+SELECT message_id, sender_id, message, send_datetime FROM message JOIN person on person_id = sender_id GROUP BY  person_id;
+SELECT message.message_id, message.sender_id, message.message, message.send_datetime, image.image_id, image.image_name, image.image_location FROM message
+JOIN message_image
+ON message.message_id = message_image.message_id
+JOIN image
+ON message.message_id = image.image_id
+GROUP BY message.sender_id;
